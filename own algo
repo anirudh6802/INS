@@ -1,0 +1,120 @@
+# Define your customized S-Box
+import math
+
+s_box = {}
+def create_s_box(key):
+    # Generate the S-Box based on the given key
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    unique_key = ''.join(set(key)) # remove duplicates from key
+    remaining_letters = ''.join(sorted(set(alphabet) - set(unique_key)))
+    mixed_alphabet = unique_key + remaining_letters
+    s_box = {}
+    for i, letter in enumerate(alphabet):
+        s_box[letter] = mixed_alphabet[i]
+    return s_box
+    
+def encrypt(plaintext, s_box):
+    # Apply S-Box substitution to each character in the plaintext
+    substituted_text = ''.join([s_box.get(char.lower(), char) for char in plaintext])
+
+    cipher = ""
+    msg = substituted_text
+    print(msg)
+    key_index = len(key) - 1
+    
+    msg_len = float(len(msg))
+    msg_lst = list(msg)
+    key_lst = sorted(list(key))
+    
+    col = len(key)
+	
+    row = int(math.ceil(msg_len / col))
+
+    fill_null = int((row * col) - msg_len)
+    msg_lst.extend('_' * fill_null)
+    
+    matrix = []
+    for i in range(0, len(msg_lst), col):
+        matrix.append(msg_lst[i: i + col])
+	    
+    print(matrix)
+
+    for i in range(col):
+	    curr_idx = key.index(key_lst[key_index])
+		
+	    for row in matrix:
+		    cipher += ''.join(row[curr_idx])
+
+	    key_index -= 1
+
+    return cipher
+
+def get_key(val):
+    for key, value in s_box.items():
+        if val == value:
+            return key
+    return ' '
+            
+def decrypt(ciphertext, s_box):
+    
+    decrypted_message = ""
+    cipher = ciphertext
+    key_index = 0
+    msg_indx = 0
+    msg_len = float(len(cipher))
+    msg_lst = list(cipher)
+    
+    col = len(key)
+    
+    row = int(math.ceil(msg_len / col))
+    key_lst = sorted(list(key), reverse = True)
+    
+    deciphered_cipher_message = []
+
+    for i in range(row):
+        deciphered_cipher_message += [[None] * col]
+    
+    for i in range(col):
+    	curr_idx = key.index(key_lst[key_index])
+
+    	for j in range(row):
+    		deciphered_cipher_message[j][curr_idx] = msg_lst[msg_indx]
+    		msg_indx += 1
+    	key_index += 1
+
+    try:
+	    decrypted_message = ''.join(sum(deciphered_cipher_message, []))
+	    
+    except TypeError:
+    	raise TypeError("This program cannot",
+    					"handle repeating words.")
+
+    null_count = decrypted_message.count('_')
+    
+    original_text = []
+    if null_count > 0:
+        for char in decrypted_message:
+            
+                original_text.append(get_key(char))
+        # original_text = ''.join([get_key(char) for char in decrypted_message])
+        return original_text[: -null_count]
+    
+    
+    # 	return decrypted_message
+    # Apply reverse S-Box substitution to each character in the plaintext
+    original_text = ''.join([get_key(char) for char in decrypted_message])
+    
+    return original_text
+
+# Example usage
+msg = input("Enter the plain text : ")
+key = input("Enter the key : ")
+s_box = create_s_box(key)
+
+print("\nPlaintext Message:", msg)
+
+cipher = encrypt(msg, s_box)
+print("\nCiphertext Message: {}".format(cipher))
+
+decrypted_message = decrypt(cipher, s_box)
+print("\nDecryped Message: {}\n".format(decrypted_message))
