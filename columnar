@@ -1,0 +1,85 @@
+def val(key):
+  temp = []
+  for i in key:
+    temp.append(i)
+  temp.sort()
+  keys = []
+  for i in key:
+    pos = temp.index(i)
+    if key.count(i) > 1:
+      keys.append(str(pos + 1))
+      temp1 = key[0 : key.index(i)]
+      temp2 = key[key.index(i) + 1 : ]
+      key = temp1 + '0' + temp2
+      temp.pop(pos)
+      temp.insert(pos, '0')
+    elif key.count(i) == 1:
+      keys.append(str(pos + 1))      
+  return keys
+
+def encrypt(pt, keys):
+  l = len(pt)
+  l1 = len(keys)
+  if (l % l1) == 0:
+    rows = int(l/l1)
+  else:
+    temp = int(l/l1)
+    for i in range(0, (temp + 1) * l1 - l):
+      st = "X"
+      pt += st
+    rows = (len(pt))/l1
+
+  fin = []
+  i = 0
+  while i < l:
+    li = []
+    for j in range(0, l1):
+      li.append(pt[i])
+      i += 1
+    fin.append(li)
+  print(fin)
+  ct = ""
+  for i in range(1, len(keys)+1):
+    pos = keys.index(str(i))
+    for j in fin:
+      ct += j[pos]
+  return ct
+
+def decrypt(ct, keys):
+  l = len(ct)
+  l1 = len(keys)
+  rows = int(l/l1)
+  fin = []
+  i = 0
+  while i < l:
+    li = []
+    for j in range(0, l1):
+      li.append('x')
+      i += 1
+    fin.append(li)
+  i = 0
+  j = 1
+  while i < l:
+    pos = keys.index(str(j))
+    for k in range(0, rows):
+      fin[k][pos] = ct[i]
+      i += 1
+    j += 1
+    fin.append(li)
+  pt = ""
+  for i in range(0, rows):
+    for j in range(0, l1):
+      pt += fin[i][j]
+  return pt
+
+key = input("Enter key: ")
+key = key.upper()
+keys = val(key)
+print(keys)
+pt = input("Enter plain text: ")
+pt = pt.replace(' ', '')
+pt = pt.upper()
+ct = encrypt(pt, keys)
+print("Cipher text - ", ct)
+pt = decrypt(ct, keys)
+print("Plain text - ", pt)
