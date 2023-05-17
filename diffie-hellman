@@ -1,0 +1,18 @@
+import random as r
+
+p = int(input("Enter value of p: "))
+g = int(input("Enter value of g: "))
+A = r.randint(3, 1000)
+B = r.randint(3, 1000)
+
+print("A - ", A)
+print("B - ", B)
+
+X_a = (g**A) % p
+X_b = (g**B) % p
+
+A_k = (X_b**A) % p
+B_k = (X_a**B) % p
+
+if A_k == B_k:
+  print("Symmetric Key = ", A_k)
