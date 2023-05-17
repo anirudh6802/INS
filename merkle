@@ -1,0 +1,38 @@
+from hashlib import sha256
+
+def hash(x):
+  ans = sha256(x.encode("utf-8")).hexdigest()
+  return ans
+
+def hash_value(h):
+  h1 = []
+  if len(h) % 2 == 0:
+    for i in range(0, len(h), 2):
+      text = h[i] + h[i + 1]
+      h1.append(hash(text))
+  else:
+    for i in range(0, len(h) - 1, 2):
+      text = h[i] + h[i + 1]
+      h1.append(hash(text))
+    h1.append(h[len(h) - 1])
+
+  return h1
+
+para = input("Enter para (use '.' to seperate lines): ")
+
+l = para.split('.')
+count = len(l)
+
+if count % 8 != 0 :
+  temp = int(count / 8)
+  for i in range(0, (temp + 1) * 8 - count):
+    l.append(l[count - 1])
+
+h = list(map(hash, l))
+length = len(h)
+
+while length > 1:
+  h = hash_value(h)
+  length = len(h)
+
+print("\n\nMerkle root - ", h[0])
